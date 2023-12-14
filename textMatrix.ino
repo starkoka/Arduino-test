@@ -262,7 +262,7 @@ void printTxt() {
 void setTxt(String txt) {
   txt = " " + txt;
   free(str);
-  char *pt = (char *)malloc(100);
+  char *pt = (char *)malloc(1000);
   str = pt;
   txt.toCharArray(str, 100);
 
