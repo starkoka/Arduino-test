@@ -353,6 +353,10 @@ String ncr_decode(String str) {
           result += "、";
           i += 7;
           continue;
+        } else if (num == 12541) {
+          result += "。";
+          i += 7;
+          continue;
         } else if (num >= 12354 && num <= 12435 && hiragana[num - 12353] != "#") {
           result += hiragana[num - 12353];
           i += 7;
