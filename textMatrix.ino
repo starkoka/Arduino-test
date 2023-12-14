@@ -41,14 +41,13 @@ WiFiServer server(80);
 ArduinoLEDMatrix matrix;
 const uint32_t animation[][4] = {
   {
-		0x00000000,
-		0x00000000,
-		0x00000000,
-		66
-	}
+    0x00000000,
+    0x00000000,
+    0x00000000,
+    66
+  }
 };
 
-char *str;
 byte buf[40][8];   //フォントデータ格納用。一つめの要素数が文字数（多めでいい）
 byte matrix_buff[2000];  //表示用90度回転ピクセルデータ。文字数×8ぶん必要？（多めでいい）
 
@@ -56,6 +55,7 @@ byte matrix_buff[2000];  //表示用90度回転ピクセルデータ。文字数
 #define SCROLL_TIME 100   //ミリ秒
 unsigned long tm = 0;
 
+char *str;
 int idx = 0, max_idx;
 bool txtPrint = false;
 
@@ -82,9 +82,18 @@ void printTxt(){
 }
 
 void setTxt(String txt){
+  txt = " "+txt;
   free(str);
-  str = (char *)malloc(sizeof(txt)*2+1);
-  txt.toCharArray(str, sizeof(txt)*2+1);
+  char *pt = (char *)malloc(100);
+  str = pt;
+  txt.toCharArray(str, 100);
+
+  Serial.println((int)&pt);
+  Serial.println(txt);
+  
+  for(int i=0;i<2000;i++){
+       matrix_buff[i] = (byte)0;
+  }
   
   char *ptr = str;
   max_idx = 10;
@@ -94,6 +103,7 @@ void setTxt(String txt){
   while(*ptr) {
     ptr = getFontData(&buf[n++][0], ptr);  // フォントデータの取得
   }
+  max_idx = 0;
   for (byte j=0; j < n; j++) { //文字
     for (byte k=0; k<8;k++) { //横
       for (byte i=0; i < 8; i++) { //縦
@@ -103,6 +113,7 @@ void setTxt(String txt){
       max_idx++;
     }
   }
+  Serial.println(max_idx);
 }
 
 
@@ -136,7 +147,7 @@ void setup() {
   server.begin();                           // start the web server on port 80
   printWifiStatus();                        // you're connected now, so print out the status
   
-  setTxt("クリックしていません");
+  setTxt("こかすたーのたんじょうび");
 }
 
 
@@ -166,6 +177,7 @@ void loop() {
             // the content of the HTTP response follows the header:
             client.print("<p style=\"font-size:7vw;\">Click <a href=\"/H\">here</a> to view the bird logo<br></p>");
             client.print("<p style=\"font-size:7vw;\">Click <a href=\"/L\">here</a> to hide the bird logo<br></p>");
+            client.print("<CENTER><form method=get>Enter text to be displayed<input type=text size=3 name=txt> <input type=submit value=submit></form></CENTER></body></html><br>");
             
             // The HTTP response ends with another blank line:
             client.println();
@@ -182,12 +194,12 @@ void loop() {
         if (currentLine.endsWith("GET /H")) {
           digitalWrite(LED_BUILTIN, HIGH);               // GET /H turns the LED on
           idx = 0;
-          setTxt("上をクリックしました");
+          setTxt("ロボ研");
         }
         if (currentLine.endsWith("GET /L")) {
           digitalWrite(LED_BUILTIN, LOW);                // GET /L turns the LED off
           idx = 0;
-          setTxt("下をクリックました");
+          setTxt("期待できない");
         }
       }
       
